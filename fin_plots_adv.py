@@ -17,14 +17,25 @@ quotes: pd.DataFrame
 
 2) Creating a user's config data
 
-my_conf: dictionary
-    pass
+candle_conf: dictionary
+    type: str
+        graph, value='candle'
+    volume: bool
+        adds a barchart for trade volume per day if True
+    figratio: tuple
+        fugure size (width, heigth)
+    figscale: float
+        scales aspect ratio
+     
 
 3) Creating three plots
 - candle;
 - oclh;
 - combined (candle + barchart)
-Manual: https://github.com/matplotlib/mplfinance/blob/master/examples/customization_and_styles.ipynb
+
+Manual by the library authors:
+==============================
+https://github.com/matplotlib/mplfinance/blob/master/examples/customization_and_styles.ipynb
 """
 
 
@@ -40,20 +51,13 @@ import matplotlib.dates as dates
 quotes = web.DataReader('^GDAXI', data_source='yahoo', #don't use 'google' as a data_source
                       start='5/1/2014', end='6/30/2014')
 
-#title
-my_title = 'DAX Index'
+
+
+#graph 1 - candle
+#base params dict
 candle_conf = dict(type='candle',volume=False,figratio=(8,5),figscale=0.5)
-# own colorsert (blue/red for up and down)
-mc = mpf.make_marketcolors(up='b',down='r')
-s  = mpf.make_mpf_style(marketcolors=mc)
 
-
-
-#my_style = mpf.make_mpf_style(marketcolors=bl_re_col, gridcolor='black')
-#mpf.plot(quotes, **kwargs,
-#         title=my_title, ylabel='Index Level',
-#         style=s)
-
+#custom colorsert (blue/red for up and down)
 
 mc = mpf.make_marketcolors(up='blue',down='red',
                            edge='inherit',
@@ -61,25 +65,25 @@ mc = mpf.make_marketcolors(up='blue',down='red',
                            volume='in',
                            ohlc='i')
 s  = mpf.make_mpf_style(marketcolors=mc)
-'''
+#plot
 mpf.plot(quotes,**candle_conf,
          title=my_title, ylabel='Index Level',
          style=s)
 
+#graph 2 - ohlc
+#base params = copy candle params and modify
 ohlc_conf = candle_conf.copy()
 ohlc_conf.update(type='ohlc')
-
+#plot
 mpf.plot(quotes,**ohlc_conf,
          title=my_title, ylabel='Index Level',
          style=s)
-'''
 
+#graph 3 - candle + volume
+#base params = copy candle params + volume=True
 candle_conf_bar = candle_conf.copy()
 candle_conf_bar.update(volume=True)
-"""
-candle_conf_bar = dict(type='candle',
-              figratio=(8,5),figscale=0.5, show_nontrading=True)
-"""
+#plot
 mpf.plot(quotes,**candle_conf_bar,
          title=my_title, ylabel='Index Level',
          ylabel_lower = 'Volume',
